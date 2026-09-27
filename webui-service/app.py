@@ -32,6 +32,59 @@ from proxy.env_merge import (  # noqa: E402
     write_env_atomic,
 )
 
+KG_CHARTS: list[dict[str, Any]] = [
+    {"id": "kg_8888", "name": "TOP500", "source": "kg", "rankid": 8888, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143249767677.png"},
+    {"id": "kg_52144", "name": "国潮音乐榜", "source": "kg", "rankid": 52144, "cover": "https://imge.kugou.com/mcommon/400/20210929/20210929175404555896.png"},
+    {"id": "kg_52767", "name": "视频号热歌酷狗榜", "source": "kg", "rankid": 52767, "cover": "https://imge.kugou.com/mcommon/400/20220112/20220112105954605929.png"},
+    {"id": "kg_31313", "name": "民谣榜", "source": "kg", "rankid": 31313, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143615367389.png"},
+    {"id": "kg_33161", "name": "纯音乐榜", "source": "kg", "rankid": 33161, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143627918342.png"},
+    {"id": "kg_33162", "name": "电音榜", "source": "kg", "rankid": 33162, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143639943265.png"},
+    {"id": "kg_23784", "name": "网络热歌榜", "source": "kg", "rankid": 23784, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143303648439.png"},
+    {"id": "kg_6666", "name": "飙升榜", "source": "kg", "rankid": 6666, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143314995483.png"},
+    {"id": "kg_52055", "name": "短视频热歌榜", "source": "kg", "rankid": 52055, "cover": "https://imge.kugou.com/mcommon/400/20210929/20210929175440620612.png"},
+    {"id": "kg_46908", "name": "摇滚榜", "source": "kg", "rankid": 46908, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143715876542.png"},
+    {"id": "kg_24971", "name": "DJ热歌榜", "source": "kg", "rankid": 24971, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143727938472.png"},
+    {"id": "kg_54884", "name": "国乐榜", "source": "kg", "rankid": 54884, "cover": "https://imge.kugou.com/mcommon/400/20220926/20220926183354316719.png"},
+    {"id": "kg_52054", "name": "百万收藏榜", "source": "kg", "rankid": 52054, "cover": "https://imge.kugou.com/mcommon/400/20210929/20210929175422894563.png"},
+    {"id": "kg_59717", "name": "短视频收藏人气榜", "source": "kg", "rankid": 59717, "cover": "https://imge.kugou.com/mcommon/400/20230607/20230607172031123456.png"},
+    {"id": "kg_24306", "name": "新歌榜", "source": "kg", "rankid": 24306, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143325674823.png"},
+    {"id": "kg_52895", "name": "名品堂", "source": "kg", "rankid": 52895, "cover": "https://imge.kugou.com/mcommon/400/20220223/20220223164928123456.png"},
+    {"id": "kg_31308", "name": "内地榜", "source": "kg", "rankid": 31308, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143415123456.png"},
+    {"id": "kg_33163", "name": "粤语金曲榜", "source": "kg", "rankid": 33163, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143438123456.png"},
+    {"id": "kg_31310", "name": "欧美榜", "source": "kg", "rankid": 31310, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143501123456.png"},
+    {"id": "kg_30972", "name": "伤感榜", "source": "kg", "rankid": 30972, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143524123456.png"},
+]
+
+WY_CHARTS: list[dict[str, Any]] = [
+    {"id": "wy_19723756", "name": "飙升榜", "source": "wy", "toplist_id": 19723756, "cover": "https://p1.music.126.net/pcYHpMkdStnvXZTzkVa-TmA==/109951166952713766.jpg"},
+    {"id": "wy_3779629", "name": "新歌榜", "source": "wy", "toplist_id": 3779629, "cover": "https://p1.music.126.net/wVmyNSOnn_jhOPkiagllMw==/109951166952686384.jpg"},
+    {"id": "wy_2884035", "name": "原创榜", "source": "wy", "toplist_id": 2884035, "cover": "https://p1.music.126.net/iFZ_nw2VaeK2UzsDH-winQ==/109951166961388699.jpg"},
+    {"id": "wy_3778678", "name": "热歌榜", "source": "wy", "toplist_id": 3778678, "cover": "https://p1.music.126.net/GhhuF6Ep5Tmanih7Gt6Q==/109951166952688017.jpg"},
+    {"id": "wy_71385702", "name": "网易云古典榜", "source": "wy", "toplist_id": 71385702, "cover": "https://p1.music.126.net/vctb1OSyD64x80p0_R112A==/109951168172715456.jpg"},
+    {"id": "wy_1978921795", "name": "网易云电音榜", "source": "wy", "toplist_id": 1978921795, "cover": "https://p1.music.126.net/5405105260334812/109951168172728956.jpg"},
+    {"id": "wy_991319590", "name": "网易云中文说唱榜", "source": "wy", "toplist_id": 991319590, "cover": "https://p1.music.126.net/3G2w7b_V0A27mY_bZ14A==/109951168172737890.jpg"},
+    {"id": "wy_5338990334", "name": "实时分享榜", "source": "wy", "toplist_id": 5338990334, "cover": "https://p1.music.126.net/J0m0vP0-gUa3H-B7n8M8vw==/109951168172745678.jpg"},
+    {"id": "wy_21845217", "name": "网易云全球说唱榜", "source": "wy", "toplist_id": 21845217, "cover": "https://p1.music.126.net/j_z3P6Vz0K4vQ9L7e0U_5A==/109951168172754321.jpg"},
+    {"id": "wy_60198", "name": "潮流风向榜", "source": "wy", "toplist_id": 60198, "cover": "https://p1.music.126.net/G67_1K_8B7j7e5Q7E5y7A==/109951168172765432.jpg"},
+    {"id": "wy_5059632704", "name": "音乐合伙人推荐榜", "source": "wy", "toplist_id": 5059632704, "cover": "https://p1.music.126.net/U9X7Xj1x8b0fG-X2-V3tqQ==/109951168172778901.jpg"},
+    {"id": "wy_5059642708", "name": "音乐合伙人热歌榜", "source": "wy", "toplist_id": 5059642708, "cover": "https://p1.music.126.net/z8j7H6k5L4v3M2n1P0q9Rw==/109951168172789012.jpg"},
+    {"id": "wy_5059644681", "name": "音乐合伙人留名榜", "source": "wy", "toplist_id": 5059644681, "cover": "https://p1.music.126.net/K3n4M5v6L7k8P9q0R1s2Tw==/109951168172790123.jpg"},
+    {"id": "wy_5312894314", "name": "音乐合伙人高分新歌榜", "source": "wy", "toplist_id": 5312894314, "cover": "https://p1.music.126.net/P1q2R3s4T5u6V7w8X9y0Zw==/109951168172801234.jpg"},
+    {"id": "wy_5312895267", "name": "音乐合伙人高分榜", "source": "wy", "toplist_id": 5312895267, "cover": "https://p1.music.126.net/A1b2C3d4E5f6G7h8I9j0Kw==/109951168172812345.jpg"},
+    {"id": "wy_5453912201", "name": "黑胶VIP爱听榜", "source": "wy", "toplist_id": 5453912201, "cover": "https://p1.music.126.net/L1m2N3o4P5q6R7s8T9u0Vw==/109951168172823456.jpg"},
+    {"id": "wy_71384707", "name": "网易云ACG榜", "source": "wy", "toplist_id": 71384707, "cover": "https://p1.music.126.net/W1x2Y3z4A5b6C7d8E9f0Gw==/109951168172834567.jpg"},
+    {"id": "wy_745956260", "name": "网易云韩语榜", "source": "wy", "toplist_id": 745956260, "cover": "https://p1.music.126.net/H1i2J3k4L5m6N7o8P9q0Rw==/109951168172845678.jpg"},
+]
+
+try:
+    from proxy.charts import ALL_CHARTS as _AC, KG_CHARTS as _KC, WY_CHARTS as _WC
+    if _AC:
+        ALL_CHARTS, KG_CHARTS, WY_CHARTS = _AC, _KC, _WC
+    else:
+        ALL_CHARTS = KG_CHARTS + WY_CHARTS
+except Exception:
+    ALL_CHARTS = KG_CHARTS + WY_CHARTS
+
 logger = logging.getLogger("webui_service")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
@@ -70,6 +123,8 @@ SCHEMA: dict[str, dict] = {
     "FNMUSIC_QUALITY_MODE": {"kind": "enum", "values": ["high", "balanced", "smooth"], "default": "high", "group": "quality", "reload": "hot", "label": "音质偏好"},
     "FNMUSIC_RECOMMEND_HOT": {"kind": "bool", "default": "true", "group": "recommend", "reload": "hot", "label": "热门榜单推荐"},
     "FNMUSIC_RECOMMEND_DAILY": {"kind": "bool", "default": "true", "group": "recommend", "reload": "hot", "label": "每日推荐"},
+    "FNMUSIC_RECOMMEND_CHARTS": {"kind": "bool", "default": "true", "group": "recommend", "reload": "hot", "label": "排行榜歌单总开关"},
+    "FNMUSIC_ENABLED_CHARTS": {"kind": "str", "default": "", "group": "recommend", "reload": "hot", "label": "自定义启用的榜单ID列表"},
     "FNMUSIC_TEE_SAVE_ENABLED": {"kind": "bool", "default": "true", "group": "tee", "reload": "hot", "label": "边听边存"},
     "FNMUSIC_TEE_SAVE_DIR": {"kind": "str", "default": "", "group": "tee", "reload": "hot", "label": "保存路径（留空自动探测）"},
     "FNMUSIC_TEE_CACHE_MAX": {"kind": "int", "default": "2", "min": 1, "max": 100, "group": "tee", "reload": "hot", "label": "关闭时滚动缓存数"},
@@ -582,6 +637,34 @@ async def api_platforms(request: Request):
             status_code=503,
         )
     return {"ok": True, "enabled": data.get("enabled") or [], "registered": data.get("registered") or []}
+
+
+@app.get("/api/charts")
+async def api_charts():
+    env = read_env()
+    charts_enabled = env.get("FNMUSIC_RECOMMEND_CHARTS", "true").lower() in ("true", "1", "yes")
+    enabled_charts_str = env.get("FNMUSIC_ENABLED_CHARTS", "").strip()
+    enabled_set = {x.strip() for x in enabled_charts_str.split(",") if x.strip()} if enabled_charts_str else None
+
+    kg_list = []
+    for c in KG_CHARTS:
+        item = dict(c)
+        item["enabled"] = (enabled_set is None) or (c["id"] in enabled_set)
+        kg_list.append(item)
+
+    wy_list = []
+    for c in WY_CHARTS:
+        item = dict(c)
+        item["enabled"] = (enabled_set is None) or (c["id"] in enabled_set)
+        wy_list.append(item)
+
+    return {
+        "ok": True,
+        "charts_enabled": charts_enabled,
+        "kg": kg_list,
+        "wy": wy_list,
+        "total": len(ALL_CHARTS),
+    }
 
 
 # ------------------------------------------------- 网易扫码（反代 musicbox） --

@@ -32,11 +32,13 @@ from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 
 try:
+    from . import charts
     from . import recommend as dailyrec
     from .cache_gc import purge_rolling, sweep_orphan_lyrics
     from .env_merge import parse_env_file
     from .version import get_version
 except ImportError:  # uvicorn --app-dir proxy
+    import charts  # type: ignore
     import recommend as dailyrec  # type: ignore
     from cache_gc import purge_rolling, sweep_orphan_lyrics  # type: ignore
     from env_merge import parse_env_file  # type: ignore
@@ -131,6 +133,10 @@ CONF = {
     "quality_mode": (os.environ.get("FNMUSIC_QUALITY_MODE") or "high").strip().lower(),
     "recommend_hot": os.environ.get("FNMUSIC_RECOMMEND_HOT", "true").lower() in ("true", "1", "yes"),
     "recommend_daily": os.environ.get("FNMUSIC_RECOMMEND_DAILY", "true").lower() in ("true", "1", "yes"),
+    "recommend_charts": os.environ.get("FNMUSIC_RECOMMEND_CHARTS", "true").lower() in ("true", "1", "yes"),
+    "kg_charts": os.environ.get("FNMUSIC_KG_CHARTS", "true").lower() in ("true", "1", "yes"),
+    "wy_charts": os.environ.get("FNMUSIC_WY_CHARTS", "true").lower() in ("true", "1", "yes"),
+    "enabled_charts": (os.environ.get("FNMUSIC_ENABLED_CHARTS") or "").strip(),
     "cover_enrich": os.environ.get("FNMUSIC_COVER_ENRICH", "true").lower() in ("true", "1", "yes"),
     "env_watch": os.environ.get("FNMUSIC_ENV_WATCH", "true").lower() in ("true", "1", "yes"),
 }
@@ -435,6 +441,10 @@ _ENV_WATCH_KEYS: dict[str, tuple[str, str]] = {
     "FNMUSIC_LIBRARY_SCAN_PATH": ("library_scan_path", "str"),
     "FNMUSIC_RECOMMEND_HOT": ("recommend_hot", "bool"),
     "FNMUSIC_RECOMMEND_DAILY": ("recommend_daily", "bool"),
+    "FNMUSIC_RECOMMEND_CHARTS": ("recommend_charts", "bool"),
+    "FNMUSIC_KG_CHARTS": ("kg_charts", "bool"),
+    "FNMUSIC_WY_CHARTS": ("wy_charts", "bool"),
+    "FNMUSIC_ENABLED_CHARTS": ("enabled_charts", "str"),
     "FNMUSIC_COVER_ENRICH": ("cover_enrich", "bool"),
     "FNMUSIC_LLM_BASE_URL": ("llm_base_url", "llm_url"),
     "FNMUSIC_LLM_API_KEY": ("", "str"),
@@ -1960,6 +1970,8 @@ def ensure_registry_warm() -> None:
             if _register_fakes_from_plt(data):
                 continue
             _register_fakes_from_items(data.get("items") if isinstance(data, dict) else data)
+    for c in charts.KG_CHARTS + charts.WY_CHARTS:
+        fake_official_guid(charts.chart_guid(c["id"]))
 
 
 def resolve_real_guid(candidate: str) -> str:
@@ -3575,11 +3587,30 @@ def _placeholder_cover_response(guid: str) -> Response:
 @app.api_route("/music/api/v1/static/cover", methods=["GET", "HEAD"])
 @app.api_route("/music/api/v1/static/cover/{subpath:path}", methods=["GET", "HEAD"])
 async def static_cover(request: Request, subpath: str = ""):
-    guid = extract_guid(request, subpath if is_online_guid(subpath) else None)
-    if not guid and subpath.startswith("online:"):
-        guid = subpath
+    resolved_subpath = resolve_real_guid(subpath) if subpath else ""
+    if is_online_guid(resolved_subpath):
+        guid = resolved_subpath
+    else:
+        guid = extract_guid(request, subpath or None)
+        if not guid and subpath.startswith("online:"):
+            guid = subpath
     playlist_kind = dailyrec.online_playlist_kind(guid)
     if playlist_kind:
+        if playlist_kind == "chart":
+            chart_id = charts.chart_id_from_guid(guid)
+            cover = charts.get_chart_cover(chart_id)
+            if not cover:
+                try:
+                    await charts.get_or_load_chart_tracks(chart_id)
+                    cover = charts.get_chart_cover(chart_id)
+                except Exception as e:
+                    logger.warning("Failed to fetch chart cover for %s: %s", chart_id, e)
+            if cover:
+                return RedirectResponse(cover, status_code=302)
+            meta = charts.chart_meta(chart_id)
+            if meta and meta.get("cover"):
+                return RedirectResponse(meta["cover"], status_code=302)
+            return _placeholder_cover_response(guid)
         upstream_client = get_upstream_client(request.app)
         is_authed, user_guid, auth_resp = await _probe_upstream_auth(request, upstream_client)
         if not is_authed and auth_resp is not None:
@@ -4411,8 +4442,9 @@ async def playlist_list(request: Request):
         return auth_resp or JSONResponse(content=envelope, headers=headers)
 
     kinds = _recommend_kinds_enabled()
-    if not kinds:
-        # 两个推荐开关全关：不注入任何推荐占位歌单
+    charts_enabled = bool(CONF.get("recommend_charts", True))
+    if not kinds and not charts_enabled:
+        # 推荐与榜单开关全关：不注入任何推荐占位歌单
         return JSONResponse(content=envelope, headers=headers)
 
     data = envelope.get("data")
@@ -4437,6 +4469,21 @@ async def playlist_list(request: Request):
         rec = _playlist_public_fields(bundle.get("playlist") or {}, tracks)
         rec["trackCount"] = len(tracks)
         recs.append(rec)
+
+    # 注入酷狗与网易云多榜单歌单
+    enabled_charts = charts.list_enabled_charts(
+        enable_charts=charts_enabled,
+        enable_kg=bool(CONF.get("kg_charts", True)),
+        enable_wy=bool(CONF.get("wy_charts", True)),
+        custom_whitelist=CONF.get("enabled_charts"),
+    )
+    for c in enabled_charts:
+        chart_id = c["id"]
+        cached_tracks = charts.load_chart_cache(chart_id, charts._today())
+        tc = len(cached_tracks) if cached_tracks else 100
+        rec = charts.build_chart_playlist_record(chart_id, track_count=tc)
+        fake_official_guid(rec["guid"])
+        recs.append(rec)
     official = [
         it for it in official
         if not (isinstance(it, dict) and dailyrec.is_recommend_playlist_guid(str(it.get("guid") or "")))
@@ -4449,7 +4496,8 @@ async def playlist_list(request: Request):
 
 @app.get("/music/api/v1/playlist/detail")
 async def playlist_detail(request: Request):
-    guid = str(request.query_params.get("guid") or "").strip()
+    raw_guid = str(request.query_params.get("guid") or "").strip()
+    guid = resolve_real_guid(raw_guid)
     kind = dailyrec.online_playlist_kind(guid)
     if not kind:
         # 官方歌单：本地存在在线附加条目才拦截修正 trackCount，否则纯透传
@@ -4474,6 +4522,14 @@ async def playlist_detail(request: Request):
                 data["trackCount"] = (tc if isinstance(tc, int) else 0) + len(extras)
         return JSONResponse(content=envelope, headers=headers)
 
+    if kind == "chart":
+        chart_id = charts.chart_id_from_guid(guid)
+        cached_tracks = charts.load_chart_cache(chart_id, charts._today())
+        tc = len(cached_tracks) if cached_tracks else 100
+        rec = charts.build_chart_playlist_record(chart_id, track_count=tc)
+        fake_official_guid(guid)
+        return JSONResponse(content={"code": 0, "msg": "ok", "data": rec})
+
     upstream_client = get_upstream_client(request.app)
     is_authed, user_guid, auth_resp = await _probe_upstream_auth(request, upstream_client)
     if not is_authed and auth_resp is not None:
@@ -4488,12 +4544,13 @@ async def playlist_detail(request: Request):
 async def playlist_batch_detail(request: Request):
     raw = request.query_params.get("guids") or request.query_params.get("guid") or ""
     guids = [g.strip() for g in raw.split(",") if g.strip()]
-    recommend_ids = [g for g in guids if dailyrec.is_recommend_playlist_guid(g)]
+    resolved_map = {g: resolve_real_guid(g) for g in guids}
+    recommend_ids = [g for g in guids if dailyrec.is_recommend_playlist_guid(resolved_map[g])]
     if not recommend_ids and not plt_dir_has_data():
         return await forward_to_upstream(request, get_upstream_client(request.app))
 
     upstream_client = get_upstream_client(request.app)
-    rest = [g for g in guids if not dailyrec.is_recommend_playlist_guid(g)]
+    rest = [g for g in guids if not dailyrec.is_recommend_playlist_guid(resolved_map[g])]
     official_list: list = []
     if rest:
         headers = copy_incoming_headers(request)
@@ -4529,22 +4586,32 @@ async def playlist_batch_detail(request: Request):
                     it["trackCount"] = (tc if isinstance(tc, int) else 0) + extra
     recs: list[dict] = []
     for g in recommend_ids:
-        kind = dailyrec.online_playlist_kind(g) or "daily"
-        bundle = await _load_daily_bundle(request, user_guid, kind)
-        rec = _playlist_public_fields(bundle.get("playlist") or {}, bundle.get("tracks") or [])
-        rec["trackCount"] = len(bundle.get("tracks") or [])
-        recs.append(rec)
+        real_g = resolved_map[g]
+        kind = dailyrec.online_playlist_kind(real_g) or "daily"
+        if kind == "chart":
+            chart_id = charts.chart_id_from_guid(real_g)
+            cached_tracks = charts.load_chart_cache(chart_id, charts._today())
+            tc = len(cached_tracks) if cached_tracks else 100
+            rec = charts.build_chart_playlist_record(chart_id, track_count=tc)
+            fake_official_guid(real_g)
+            recs.append(rec)
+        else:
+            bundle = await _load_daily_bundle(request, user_guid, kind)
+            rec = _playlist_public_fields(bundle.get("playlist") or {}, bundle.get("tracks") or [])
+            rec["trackCount"] = len(bundle.get("tracks") or [])
+            recs.append(rec)
     return JSONResponse(content={"code": 0, "msg": "ok", "data": {"list": recs + official_list}})
 
 
 @app.get("/music/api/v1/track/playlist-detail/list")
 async def playlist_track_list(request: Request):
-    guid = str(
+    raw_guid = str(
         request.query_params.get("playlistGUID")
         or request.query_params.get("playlistGuid")
         or request.query_params.get("guid")
         or ""
     ).strip()
+    guid = resolve_real_guid(raw_guid)
     kind = dailyrec.online_playlist_kind(guid)
     if not kind:
         # 官方歌单：本地存在在线附加条目才拦截合并，否则纯透传
@@ -4612,6 +4679,37 @@ async def playlist_track_list(request: Request):
         data["total"] = official_total + len(online_objs)
         return JSONResponse(content=disguise_client_json(envelope), headers=headers)
 
+
+    if kind == "chart":
+        chart_id = charts.chart_id_from_guid(guid)
+        raw_tracks = await charts.get_or_load_chart_tracks(
+            chart_id=chart_id,
+            netease_enabled=bool(CONF.get("netease_enabled")),
+            limit=int(os.environ.get("FNMUSIC_CHART_LIMIT", "100")),
+        )
+        tracks = [build_online_track(t) for t in raw_tracks]
+        tracks = dailyrec.stamp_playlist_tracks(tracks)
+        try:
+            page = max(int(request.query_params.get("page") or 1), 1)
+        except (TypeError, ValueError):
+            page = 1
+        try:
+            size = int(request.query_params.get("size") or 50)
+        except (TypeError, ValueError):
+            size = 50
+        if size == -1:
+            size = max(len(tracks), 1)
+        if size < 1:
+            size = 50
+        start = (page - 1) * size
+        page_tracks = tracks[start:start + size]
+        return JSONResponse(
+            content=disguise_client_json({
+                "code": 0,
+                "msg": "ok",
+                "data": {"list": page_tracks, "total": len(tracks), "sort": request.query_params.get("sort") or ""},
+            })
+        )
 
     upstream_client = get_upstream_client(request.app)
     is_authed, user_guid, auth_resp = await _probe_upstream_auth(request, upstream_client)

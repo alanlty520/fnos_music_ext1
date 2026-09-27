@@ -20,6 +20,7 @@
       <nav class="nav" id="nav">
         <button class="nav-item active" data-page="overview">概览</button>
         <button class="nav-item" data-page="source">音乐源</button>
+        <button class="nav-item" data-page="charts">榜单管理</button>
         <button class="nav-item" data-page="quality">播放与推荐</button>
         <button class="nav-item" data-page="tee">边听边存</button>
         <button class="nav-item" data-page="llm">高级 · 大模型</button>
@@ -124,6 +125,54 @@
             <input class="input" id="search-timeout" type="number" min="1" max="60" step="1" inputmode="numeric">
           </label>
           <p class="hint">单位为秒，默认 15。在线结果一返回就交给播放页，本地歌曲在前；到时还没有就放弃这次在线结果，只返回本地歌曲。保存后立即生效。</p>
+        </div>
+      </section>
+
+      <!-- 榜单管理 -->
+      <section class="page" id="page-charts">
+        <h2>榜单管理</h2>
+        <p class="hint">自定义飞牛音乐左侧栏显示的在线排行榜歌单。支持酷狗与网易云热门榜单，修改勾选后点击下方「保存并生效」即时刷新。</p>
+        
+        <div class="card">
+          <div class="card-title">总控制</div>
+          <label class="switch-row">
+            <span>
+              启用排行榜歌单
+              <div class="sub">关闭后飞牛音乐左侧栏将不显示任何排行榜歌单（仅保留每日推荐）</div>
+            </span>
+            <input type="checkbox" id="charts-master-switch">
+          </label>
+          <div class="chart-actions pad">
+            <button class="chart-mode-btn" id="btn-charts-select-all" type="button">全部启用</button>
+            <button class="chart-mode-btn" id="btn-charts-deselect-all" type="button">全部关闭</button>
+            <button class="chart-mode-btn" id="btn-charts-select-kg" type="button">全选酷狗</button>
+            <button class="chart-mode-btn" id="btn-charts-select-wy" type="button">全选网易云</button>
+            <span class="muted" id="charts-selected-count">已选 0 / 38</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header-row">
+            <div class="card-title">酷狗音乐榜单（20个）</div>
+            <div class="card-actions">
+              <button class="btn btn-sm" id="btn-kg-all" type="button">全选</button>
+              <button class="btn btn-sm" id="btn-kg-none" type="button">全清</button>
+            </div>
+          </div>
+          <p class="hint">数据来源于酷狗移动端官方接口，支持 TOP500、国潮榜、网络热歌榜等流行排行。</p>
+          <div id="kg-charts-grid" class="chart-grid"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header-row">
+            <div class="card-title">网易云音乐榜单（18个）</div>
+            <div class="card-actions">
+              <button class="btn btn-sm" id="btn-wy-all" type="button">全选</button>
+              <button class="btn btn-sm" id="btn-wy-none" type="button">全清</button>
+            </div>
+          </div>
+          <p class="hint">数据来源于网易云音乐官方 Toplist，支持飙升榜、新歌榜、古典榜、电音榜等。</p>
+          <div id="wy-charts-grid" class="chart-grid"></div>
         </div>
       </section>
 

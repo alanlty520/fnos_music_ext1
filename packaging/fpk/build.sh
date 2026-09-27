@@ -113,6 +113,11 @@ if [ -z "${FNPACK_BIN}" ]; then
     if command -v fnpack >/dev/null 2>&1; then
         FNPACK_BIN="$(command -v fnpack)"
     else
+        case "$(uname -s)" in
+            Darwin) FNOS=darwin ;;
+            Linux)  FNOS=linux ;;
+            *) echo "ERROR: 不支持的操作系统 $(uname -s)" >&2; exit 1 ;;
+        esac
         case "$(uname -m)" in
             x86_64) FNARCH=amd64 ;;
             aarch64|arm64) FNARCH=arm64 ;;
@@ -123,12 +128,17 @@ if [ -z "${FNPACK_BIN}" ]; then
         FNPACK_BIN="${TOOLS_DIR}/fnpack"
         if [ ! -x "${FNPACK_BIN}" ] || ! "${FNPACK_BIN}" --help >/dev/null 2>&1; then
             mkdir -p "${TOOLS_DIR}"
-            echo "[fpk] 下载 fnpack ${FNPACK_VERSION} (linux-${FNARCH})..."
+            echo "[fpk] 下载 fnpack ${FNPACK_VERSION} (${FNOS}-${FNARCH})..."
             curl -fsSL -o "${FNPACK_BIN}" \
-                "https://static2.fnnas.com/fnpack/fnpack-${FNPACK_VERSION}-linux-${FNARCH}"
+                "https://static2.fnnas.com/fnpack/fnpack-${FNPACK_VERSION}-${FNOS}-${FNARCH}"
             chmod +x "${FNPACK_BIN}"
         fi
     fi
+fi
+FNPACK_BIN="$(cd "$(dirname "${FNPACK_BIN}")" && pwd)/$(basename "${FNPACK_BIN}")"
+if [ "$(uname -s)" = "Darwin" ]; then
+    xattr -dr com.apple.quarantine "${FNPACK_BIN}" 2>/dev/null || true
+    codesign -s - -f "${FNPACK_BIN}" 2>/dev/null || true
 fi
 
 WORK_DIR="$(mktemp -d)"

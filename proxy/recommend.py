@@ -24,12 +24,16 @@ from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
-import httpx
+try:
+    import httpx
+except ImportError:
+    httpx = None  # type: ignore
 
 logger = logging.getLogger("fnmusic_proxy.recommend")
 
 DAILY_GUID_PREFIX = "online:playlist:daily:"
 HOT_GUID_PREFIX = "online:playlist:hot:"
+CHART_GUID_PREFIX = "online:playlist:chart:"
 # 酷我文本封面 host：该“封面 URL”实为含图片链接的文本页，不能当直链用（app.py 引用同一常量）
 KW_TEXT_COVER_HOST = "artistpicserver.kuwo.cn"
 DEFAULT_MODEL = "gpt-4o-mini"
@@ -114,12 +118,14 @@ def hot_playlist_guid(day: str | None = None, user_guid: str = "") -> str:
 
 
 def online_playlist_kind(guid: str | None) -> str:
-    """解析推荐歌单 guid 的类型：daily / hot，非推荐歌单返回空串。"""
+    """解析推荐歌单 guid 的类型：daily / hot / chart，非推荐歌单返回空串。"""
     s = str(guid or "")
     if s.startswith(DAILY_GUID_PREFIX):
         return "daily"
     if s.startswith(HOT_GUID_PREFIX):
         return "hot"
+    if s.startswith(CHART_GUID_PREFIX):
+        return "chart"
     return ""
 
 
