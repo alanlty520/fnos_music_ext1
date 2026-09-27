@@ -1,10 +1,12 @@
-# fnmusic-ext 飞牛音乐扩展代理
+# fnmusic-ext 飞牛音乐扩展代理（多榜单增强版）
 
-Gitee：https://gitee.com/javycoder/fnos_music_ext
+> **致敬原作者**：本项目 Fork 自 **[@javycoder](https://github.com/javycoder)** 的杰出开源项目 [fnos_music_ext](https://github.com/javycoder/fnos_music_ext)（Gitee：[javycoder/fnos_music_ext](https://gitee.com/javycoder/fnos_music_ext)）。  
+> 衷心感谢原作者 **javycoder** 卓越的零侵入 Unix Socket 接管架构设计与无私开源贡献！
+>
+> 当前分支在此基础上，新增了**酷狗 + 网易云 38 个主流热门排行榜**自动拉取与客户端歌单注入，并提供了独立的 **WebUI 榜单管理可视化页面**，支持自定义勾选与开箱即用的 `.fpk` 安装包。
 
-GitHub：https://github.com/javycoder/fnos_music_ext
-
-[![CI](https://github.com/javycoder/fnos_music_ext/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/javycoder/fnos_music_ext/actions/workflows/ci.yml)
+- 原作者仓库：[GitHub](https://github.com/javycoder/fnos_music_ext) | [Gitee](https://gitee.com/javycoder/fnos_music_ext)
+- 本分支仓库：[GitHub (zouclang/fnos_music_ext)](https://github.com/zouclang/fnos_music_ext)
 
 `fnmusic-ext` 是专为 fnOS（飞牛私有云）自带音乐应用（`trim.music`）打造的**无侵入增强扩展**。它通过接管官方后端的 Unix Socket 通信入口，在完全不修改官方程序、nginx 配置与数据库的前提下，让原生飞牛音乐获得在线音乐能力；可随时一条命令还原官方直连。
 
@@ -12,12 +14,20 @@ GitHub：https://github.com/javycoder/fnos_music_ext
 
 ## 功能特性
 
+- **38 款主流热门排行榜歌单注入（本分支特色新增）**：
+  - **酷狗音乐 20 个热门榜单**：TOP500、国潮音乐榜、网络热歌榜、飙升榜、新歌榜、民谣榜、摇滚榜、电音榜、DJ热歌榜、纯音乐榜、短视频热歌榜等；
+  - **网易云音乐 18 个官方 Toplist 榜单**：飙升榜、新歌榜、原创榜、热歌榜、古典榜、电音榜、中文说唱榜、实时分享榜、ACG榜等；
+  - 自动抓取并每日落盘缓存，动态提取官方最新高清封面，无缝融入飞牛音乐客户端左侧边栏，支持即点即播与收藏。
+- **可视化榜单管理（WebUI 本分支特色新增）**：
+  - 在管理 WebUI（8774）新增「榜单管理」页面，轻松掌控左侧栏显示的排行榜；
+  - 提供「全部启用」「全部关闭」「全选酷狗」「全选网易云」快捷切换模式，操作按钮高亮并带有对号 `✓`（对齐音乐源交互体验）；
+  - 下方卡片支持完整多选自定义，每个卡片带高清封面、音源标识与对号 `✓`，修改保存后即刻热重载生效。
 - **在线聚合搜播**：在官方搜索框输入歌名，聚合三大音源之一的曲库（见下），在线歌曲即点即播，自动补齐滚动歌词与高清封面。搜索结果严格**本地优先**：本地曲库条目始终排在前面，在线音源结果（网易 > musicdl > 洛雪）紧随其后；
 - **三音源单选**（v2.0.0 起互斥，可在 WebUI 秒级切换）：
   - [musicbox](https://github.com/darknessomi/musicbox)：网易云高品质解析，支持扫码登录 VIP/无损曲库与原生每日推荐；
   - [musicdl](https://github.com/CharlesPikachu/musicdl)：酷我/咪咕等 57 个平台聚合，可按平台粒度勾选（编号见 [musicdl-service/PLATFORMS.md](musicdl-service/PLATFORMS.md)）。部分音乐源歌曲少，或返回的音乐不可播放，请自行测试并使用可靠音乐源；
   - **lxmusic**：洛雪音乐自定义源运行时——搜索/歌词/榜单走内置平台接口，播放解析由你提供的洛雪自定义源脚本（Node 沙箱隔离运行）完成。源脚本支持三种配置方式：**粘贴 URL**、**上传电脑上的 `.js` 文件**、**从 NAS 选择 `.js`**（飞牛桌面内），搜索结果以及能否播放视源脚本而定，请自行测试并使用可靠来源；
-- **管理 WebUI**（可选，端口 8774）：浏览器里完成音源切换、musicdl 平台勾选、网易扫码、洛雪源配置（URL/上传/NAS 选择）与测试保存、音质偏好、边听边存、推荐开关与 LLM 配置，全部热生效；
+- **管理 WebUI**（可选，端口 8774）：浏览器里完成音源切换、榜单管理、musicdl 平台勾选、网易扫码、洛雪源配置（URL/上传/NAS 选择）与测试保存、音质偏好、边听边存、推荐开关与 LLM 配置，全部热生效；
 - **音质偏好**：`高音质`（从高到低）/ `平衡`（取中间档）/ `流畅`（优先最低）三种模式，覆盖全部音源；
 - **智能边听边存**：在线听歌时后台自动缓存，再次播放本地秒开；可选完整试听后保存进本地曲库；
 - **推荐体系**：「热门推荐」与「每日推荐 MM-DD」两个独立歌单、独立开关；默认采信音源原生推荐，未启用网易时可配 OpenAI 兼容大模型兜底；歌单封面取列表里第一首有封面的曲目；
@@ -141,6 +151,8 @@ curl -s --unix-socket /var/run/trim_music.socket http://localhost/_ext/healthz
 | `FNMUSIC_TEE_SAVE_ENABLED` | `true` | 边听边存开关；`FNMUSIC_TEE_SAVE_DIR` 留空自动探测飞牛共享曲库 |
 | `FNMUSIC_TEE_CACHE_MAX` | `2` | 关闭边听边存时滚动保留的试听缓存条数（仅关闭时生效） |
 | `FNMUSIC_RECOMMEND_HOT` / `FNMUSIC_RECOMMEND_DAILY` | `true` | 「热门推荐」/「每日推荐」两个独立歌单的开关（热重载） |
+| `FNMUSIC_RECOMMEND_CHARTS` | `true` | 排行榜歌单总开关，关闭后左侧栏不显示任何额外排行榜（热重载，本分支新增） |
+| `FNMUSIC_ENABLED_CHARTS` | *(空)* | 自定义启用的排行榜 ID 列表（逗号分隔，留空为全部启用；`none` 为全关，热重载，本分支新增） |
 | `FNMUSIC_COVER_ENRICH` | `true` | 缺失封面用网易曲库补全（热重载） |
 | `FNMUSIC_LLM_BASE_URL` 等 | *(空)* | 大模型每日推荐兜底（OpenAI 兼容，热重载） |
 | `FNMUSIC_ENV_WATCH` | `true` | .env 热重载总开关 |
@@ -196,11 +208,11 @@ python3 -m pytest        # 全量测试（无需 Docker/飞牛环境）
 sudo python3 tests/integration/fpk_lifecycle.py --auto-restore
 ```
 
-## 免责与版权声明
+## 致谢与版权声明
 
+- **特别致敬**：衷心感谢原作者 **[@javycoder](https://github.com/javycoder)** 创造并开源了 `fnmusic-ext` 基础框架！原作者优秀的无侵入式 Socket 劫持与代理架构，为飞牛私有云音乐体验带来了巨大的飞跃。
+- **上游致谢**：[CharlesPikachu/musicdl](https://github.com/CharlesPikachu/musicdl)、[darknessomi/musicbox](https://github.com/darknessomi/musicbox)、洛雪音乐（LX Music）社区及其自定义源规范。
 - 本项目基于 **MIT 许可证** 开源（见 [LICENSE](LICENSE)），严格限定于**个人技术研究与非商业用途**；
 - 本项目是协议中继与数据适配层，不托管、不分发任何受版权保护的音频与元数据；音频及元数据版权归属各原始版权方，请支持正版；
 - 洛雪自定义源脚本等第三方代码由使用者自行提供并在隔离子进程中运行，请仅使用可信来源的脚本、仅访问您有权收听的内容；
 - 使用者应遵守所在国家/地区法律法规与第三方平台用户协议；因滥用导致的任何责任由使用者自行承担。
-
-上游致谢：[CharlesPikachu/musicdl](https://github.com/CharlesPikachu/musicdl)、[darknessomi/musicbox](https://github.com/darknessomi/musicbox)、洛雪音乐（LX Music）社区及其自定义源规范。
