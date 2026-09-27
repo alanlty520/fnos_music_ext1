@@ -3651,8 +3651,13 @@ async def static_cover(request: Request, subpath: str = ""):
         picked = dailyrec.pick_playlist_cover_track(tracks)
         picked_guid = str((picked or {}).get("guid") or "")
         if not (picked and is_online_guid(picked_guid)):
-            # 歌单里没有可用封面：不显示图标，客户端回落自带默认样式
-            return Response(status_code=404)
+            # 每日推荐/热门推荐暂无曲目封面时，返回官方默认高清海报，避免客户端回退为灰底音符图标
+            default_cov = (
+                "https://p1.music.126.net/0SUEG8yDACfx0Bw2MYFv4Q==/109951170048519512.jpg"
+                if playlist_kind == "hot"
+                else "https://p2.music.126.net/rIi7Qzy2i2Y_1QD7cd0MYA==/109951170048506929.jpg"
+            )
+            return RedirectResponse(default_cov, status_code=302)
         guid = picked_guid
     if not is_online_guid(guid):
         return await forward_to_upstream(request, get_upstream_client(request.app))

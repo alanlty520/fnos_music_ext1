@@ -126,18 +126,26 @@ if [ -z "${FNPACK_BIN}" ]; then
         FNPACK_VERSION="${FNPACK_VERSION:-1.2.3}"
         TOOLS_DIR="${REPO_ROOT}/.tools"
         FNPACK_BIN="${TOOLS_DIR}/fnpack"
+        if [ -x "${FNPACK_BIN}" ] && [ "$(uname -s)" = "Darwin" ]; then
+            xattr -cr "${FNPACK_BIN}" 2>/dev/null || true
+            codesign -s - -f "${FNPACK_BIN}" 2>/dev/null || true
+        fi
         if [ ! -x "${FNPACK_BIN}" ] || ! "${FNPACK_BIN}" --help >/dev/null 2>&1; then
             mkdir -p "${TOOLS_DIR}"
             echo "[fpk] 下载 fnpack ${FNPACK_VERSION} (${FNOS}-${FNARCH})..."
             curl -fsSL -o "${FNPACK_BIN}" \
                 "https://static2.fnnas.com/fnpack/fnpack-${FNPACK_VERSION}-${FNOS}-${FNARCH}"
             chmod +x "${FNPACK_BIN}"
+            if [ "$(uname -s)" = "Darwin" ]; then
+                xattr -cr "${FNPACK_BIN}" 2>/dev/null || true
+                codesign -s - -f "${FNPACK_BIN}" 2>/dev/null || true
+            fi
         fi
     fi
 fi
 FNPACK_BIN="$(cd "$(dirname "${FNPACK_BIN}")" && pwd)/$(basename "${FNPACK_BIN}")"
 if [ "$(uname -s)" = "Darwin" ]; then
-    xattr -dr com.apple.quarantine "${FNPACK_BIN}" 2>/dev/null || true
+    xattr -cr "${FNPACK_BIN}" 2>/dev/null || true
     codesign -s - -f "${FNPACK_BIN}" 2>/dev/null || true
 fi
 
