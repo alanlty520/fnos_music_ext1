@@ -76,6 +76,35 @@ class TestCharts(unittest.TestCase):
                 else:
                     os.environ.pop("FNMUSIC_RECOMMEND_DIR", None)
 
+    def test_find_track_and_cover(self):
+        sample_tracks = [
+            {
+                "id": "lx:wy:12345678",
+                "source": "lx",
+                "title": "开始懂了",
+                "artist": "孙燕姿",
+                "album": "我要的幸福",
+                "cover_url": "https://p1.music.126.net/sample.jpg",
+                "duration_s": 271,
+            }
+        ]
+        charts.save_chart_cache("wy_5453912201", charts._today(), sample_tracks, cover_url="https://p1.music.126.net/header.jpg")
+        
+        # 测试根据 online guid 和原始 id 查找
+        found = charts.find_track("online:lx:wy:12345678")
+        self.assertIsNotNone(found)
+        self.assertEqual(found["title"], "开始懂了")
+        self.assertEqual(found["cover_url"], "https://p1.music.126.net/sample.jpg")
+
+        # 测试榜单封面获取
+        cover = charts.get_chart_cover("wy_5453912201")
+        self.assertEqual(cover, "https://p1.music.126.net/header.jpg")
+
+        # 测试无效 dummy 封面识别
+        self.assertTrue(charts._is_dummy_cover("https://p1.music.126.net/L1m2N3o4P5q6R7s8T9u0Vw==/109951168172823456.jpg"))
+        self.assertTrue(charts._is_dummy_cover("https://imge.kugou.com/mcommon/400/20230607/20230607172031123456.png"))
+        self.assertFalse(charts._is_dummy_cover("https://p1.music.126.net/pcYHpMkdStnvXZTzkVa-TmA==/109951166952713766.jpg"))
+
 
 if __name__ == "__main__":
     unittest.main()

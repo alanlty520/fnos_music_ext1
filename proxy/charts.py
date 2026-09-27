@@ -41,13 +41,13 @@ KG_CHARTS: list[dict[str, Any]] = [
     {"id": "kg_24971", "name": "DJ热歌榜", "source": "kg", "rankid": 24971, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143727938472.png"},
     {"id": "kg_54884", "name": "国乐榜", "source": "kg", "rankid": 54884, "cover": "https://imge.kugou.com/mcommon/400/20220926/20220926183354316719.png"},
     {"id": "kg_52054", "name": "百万收藏榜", "source": "kg", "rankid": 52054, "cover": "https://imge.kugou.com/mcommon/400/20210929/20210929175422894563.png"},
-    {"id": "kg_59717", "name": "短视频收藏人气榜", "source": "kg", "rankid": 59717, "cover": "https://imge.kugou.com/mcommon/400/20230607/20230607172031123456.png"},
+    {"id": "kg_59717", "name": "短视频收藏人气榜", "source": "kg", "rankid": 59717, "cover": ""},
     {"id": "kg_24306", "name": "新歌榜", "source": "kg", "rankid": 24306, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143325674823.png"},
-    {"id": "kg_52895", "name": "名品堂", "source": "kg", "rankid": 52895, "cover": "https://imge.kugou.com/mcommon/400/20220223/20220223164928123456.png"},
-    {"id": "kg_31308", "name": "内地榜", "source": "kg", "rankid": 31308, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143415123456.png"},
-    {"id": "kg_33163", "name": "粤语金曲榜", "source": "kg", "rankid": 33163, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143438123456.png"},
-    {"id": "kg_31310", "name": "欧美榜", "source": "kg", "rankid": 31310, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143501123456.png"},
-    {"id": "kg_30972", "name": "伤感榜", "source": "kg", "rankid": 30972, "cover": "https://imge.kugou.com/mcommon/400/20201208/20201208143524123456.png"},
+    {"id": "kg_52895", "name": "名品堂", "source": "kg", "rankid": 52895, "cover": ""},
+    {"id": "kg_31308", "name": "内地榜", "source": "kg", "rankid": 31308, "cover": ""},
+    {"id": "kg_33163", "name": "粤语金曲榜", "source": "kg", "rankid": 33163, "cover": ""},
+    {"id": "kg_31310", "name": "欧美榜", "source": "kg", "rankid": 31310, "cover": ""},
+    {"id": "kg_30972", "name": "伤感榜", "source": "kg", "rankid": 30972, "cover": ""},
 ]
 
 # 网易云音乐榜单列表（严格对齐网易云官方 Toplist）
@@ -56,20 +56,20 @@ WY_CHARTS: list[dict[str, Any]] = [
     {"id": "wy_3779629", "name": "新歌榜", "source": "wy", "toplist_id": 3779629, "cover": "https://p1.music.126.net/wVmyNSOnn_jhOPkiagllMw==/109951166952686384.jpg"},
     {"id": "wy_2884035", "name": "原创榜", "source": "wy", "toplist_id": 2884035, "cover": "https://p1.music.126.net/iFZ_nw2VaeK2UzsDH-winQ==/109951166961388699.jpg"},
     {"id": "wy_3778678", "name": "热歌榜", "source": "wy", "toplist_id": 3778678, "cover": "https://p1.music.126.net/GhhuF6Ep5Tmanih7Gt6Q==/109951166952688017.jpg"},
-    {"id": "wy_71385702", "name": "网易云古典榜", "source": "wy", "toplist_id": 71385702, "cover": "https://p1.music.126.net/vctb1OSyD64x80p0_R112A==/109951168172715456.jpg"},
-    {"id": "wy_1978921795", "name": "网易云电音榜", "source": "wy", "toplist_id": 1978921795, "cover": "https://p1.music.126.net/5405105260334812/109951168172728956.jpg"},
-    {"id": "wy_991319590", "name": "网易云中文说唱榜", "source": "wy", "toplist_id": 991319590, "cover": "https://p1.music.126.net/3G2w7b_V0A27mY_bZ14A==/109951168172737890.jpg"},
-    {"id": "wy_5338990334", "name": "实时分享榜", "source": "wy", "toplist_id": 5338990334, "cover": "https://p1.music.126.net/J0m0vP0-gUa3H-B7n8M8vw==/109951168172745678.jpg"},
-    {"id": "wy_21845217", "name": "网易云全球说唱榜", "source": "wy", "toplist_id": 21845217, "cover": "https://p1.music.126.net/j_z3P6Vz0K4vQ9L7e0U_5A==/109951168172754321.jpg"},
-    {"id": "wy_60198", "name": "潮流风向榜", "source": "wy", "toplist_id": 60198, "cover": "https://p1.music.126.net/G67_1K_8B7j7e5Q7E5y7A==/109951168172765432.jpg"},
-    {"id": "wy_5059632704", "name": "音乐合伙人推荐榜", "source": "wy", "toplist_id": 5059632704, "cover": "https://p1.music.126.net/U9X7Xj1x8b0fG-X2-V3tqQ==/109951168172778901.jpg"},
-    {"id": "wy_5059642708", "name": "音乐合伙人热歌榜", "source": "wy", "toplist_id": 5059642708, "cover": "https://p1.music.126.net/z8j7H6k5L4v3M2n1P0q9Rw==/109951168172789012.jpg"},
-    {"id": "wy_5059644681", "name": "音乐合伙人留名榜", "source": "wy", "toplist_id": 5059644681, "cover": "https://p1.music.126.net/K3n4M5v6L7k8P9q0R1s2Tw==/109951168172790123.jpg"},
-    {"id": "wy_5312894314", "name": "音乐合伙人高分新歌榜", "source": "wy", "toplist_id": 5312894314, "cover": "https://p1.music.126.net/P1q2R3s4T5u6V7w8X9y0Zw==/109951168172801234.jpg"},
-    {"id": "wy_5312895267", "name": "音乐合伙人高分榜", "source": "wy", "toplist_id": 5312895267, "cover": "https://p1.music.126.net/A1b2C3d4E5f6G7h8I9j0Kw==/109951168172812345.jpg"},
-    {"id": "wy_5453912201", "name": "黑胶VIP爱听榜", "source": "wy", "toplist_id": 5453912201, "cover": "https://p1.music.126.net/L1m2N3o4P5q6R7s8T9u0Vw==/109951168172823456.jpg"},
-    {"id": "wy_71384707", "name": "网易云ACG榜", "source": "wy", "toplist_id": 71384707, "cover": "https://p1.music.126.net/W1x2Y3z4A5b6C7d8E9f0Gw==/109951168172834567.jpg"},
-    {"id": "wy_745956260", "name": "网易云韩语榜", "source": "wy", "toplist_id": 745956260, "cover": "https://p1.music.126.net/H1i2J3k4L5m6N7o8P9q0Rw==/109951168172845678.jpg"},
+    {"id": "wy_71385702", "name": "网易云古典榜", "source": "wy", "toplist_id": 71385702, "cover": ""},
+    {"id": "wy_1978921795", "name": "网易云电音榜", "source": "wy", "toplist_id": 1978921795, "cover": ""},
+    {"id": "wy_991319590", "name": "网易云中文说唱榜", "source": "wy", "toplist_id": 991319590, "cover": ""},
+    {"id": "wy_5338990334", "name": "实时分享榜", "source": "wy", "toplist_id": 5338990334, "cover": ""},
+    {"id": "wy_21845217", "name": "网易云全球说唱榜", "source": "wy", "toplist_id": 21845217, "cover": ""},
+    {"id": "wy_60198", "name": "潮流风向榜", "source": "wy", "toplist_id": 60198, "cover": ""},
+    {"id": "wy_5059632704", "name": "音乐合伙人推荐榜", "source": "wy", "toplist_id": 5059632704, "cover": ""},
+    {"id": "wy_5059642708", "name": "音乐合伙人热歌榜", "source": "wy", "toplist_id": 5059642708, "cover": ""},
+    {"id": "wy_5059644681", "name": "音乐合伙人留名榜", "source": "wy", "toplist_id": 5059644681, "cover": ""},
+    {"id": "wy_5312894314", "name": "音乐合伙人高分新歌榜", "source": "wy", "toplist_id": 5312894314, "cover": ""},
+    {"id": "wy_5312895267", "name": "音乐合伙人高分榜", "source": "wy", "toplist_id": 5312895267, "cover": ""},
+    {"id": "wy_5453912201", "name": "黑胶VIP爱听榜", "source": "wy", "toplist_id": 5453912201, "cover": ""},
+    {"id": "wy_71384707", "name": "网易云ACG榜", "source": "wy", "toplist_id": 71384707, "cover": ""},
+    {"id": "wy_745956260", "name": "网易云韩语榜", "source": "wy", "toplist_id": 745956260, "cover": ""},
 ]
 
 ALL_CHARTS: list[dict[str, Any]] = KG_CHARTS + WY_CHARTS
@@ -78,6 +78,42 @@ _CHART_MAP: dict[str, dict[str, Any]] = {c["id"]: c for c in ALL_CHARTS}
 # 内存快速缓存，避免高频并发重复拉取
 _MEM_CACHE: dict[str, tuple[float, list[dict]]] = {}
 _FETCH_LOCKS: dict[str, asyncio.Lock] = {}
+_CHART_COVERS: dict[str, str] = {}
+_CHART_TRACKS_BY_GUID: dict[str, dict] = {}
+
+
+def _index_tracks(tracks: list[dict]) -> None:
+    """把榜单曲目建立全索引（id / online:id / online:src:id），供封面和播放极速命中"""
+    for t in tracks or []:
+        if not isinstance(t, dict):
+            continue
+        tid = str(t.get("id") or "")
+        src = str(t.get("source") or "lx")
+        if tid:
+            _CHART_TRACKS_BY_GUID[tid] = t
+            if not tid.startswith("online:"):
+                _CHART_TRACKS_BY_GUID[f"online:{tid}"] = t
+                if ":" not in tid:
+                    _CHART_TRACKS_BY_GUID[f"online:{src}:{tid}"] = t
+
+
+def find_track(guid: str) -> dict | None:
+    """根据 online guid 查找榜单曲目元数据（含封面 cover_url 等）"""
+    if not guid:
+        return None
+    if guid in _CHART_TRACKS_BY_GUID:
+        return _CHART_TRACKS_BY_GUID[guid]
+    if guid.startswith("online:"):
+        stripped = guid[len("online:"):]
+        if stripped in _CHART_TRACKS_BY_GUID:
+            return _CHART_TRACKS_BY_GUID[stripped]
+    day = _today()
+    for cid in list(_CHART_MAP.keys()):
+        if cid not in _MEM_CACHE:
+            t_list = load_chart_cache(cid, day)
+            if t_list and guid in _CHART_TRACKS_BY_GUID:
+                return _CHART_TRACKS_BY_GUID[guid]
+    return None
 
 
 def chart_guid(chart_id: str) -> str:
@@ -116,9 +152,6 @@ def _today() -> str:
     return datetime.now().strftime("%Y%m%d")
 
 
-_CHART_COVERS: dict[str, str] = {}
-
-
 def load_chart_cache(chart_id: str, day: str) -> list[dict] | None:
     # 1. 查内存
     mem = _MEM_CACHE.get(chart_id)
@@ -126,6 +159,7 @@ def load_chart_cache(chart_id: str, day: str) -> list[dict] | None:
         ts, data = mem
         # 缓存有效 4 小时
         if time.time() - ts < 14400 and data:
+            _index_tracks(data)
             return data
 
     # 2. 查本地文件
@@ -141,9 +175,11 @@ def load_chart_cache(chart_id: str, day: str) -> list[dict] | None:
                     _CHART_COVERS[chart_id] = str(cov)
                 if tracks:
                     _MEM_CACHE[chart_id] = (time.time(), tracks)
+                    _index_tracks(tracks)
                     return tracks
             elif isinstance(data, list) and data:
                 _MEM_CACHE[chart_id] = (time.time(), data)
+                _index_tracks(data)
                 return data
         except Exception as e:
             logger.warning("Failed to load chart cache from %s: %s", path, e)
@@ -154,6 +190,7 @@ def save_chart_cache(chart_id: str, day: str, tracks: list[dict], cover_url: str
     _MEM_CACHE[chart_id] = (time.time(), tracks)
     if cover_url:
         _CHART_COVERS[chart_id] = cover_url
+    _index_tracks(tracks)
     path = _cache_file(chart_id, day)
     tmp_path = path + f".tmp.{os.getpid()}"
     try:
@@ -170,22 +207,33 @@ def save_chart_cache(chart_id: str, day: str, tracks: list[dict], cover_url: str
                 pass
 
 
+def _is_dummy_cover(url: str) -> bool:
+    if not url:
+        return True
+    return "123456" in url or "109951168172" in url
+
+
 def get_chart_cover(chart_id: str) -> str:
-    if chart_id in _CHART_COVERS and _CHART_COVERS[chart_id]:
-        return _CHART_COVERS[chart_id]
+    cov = _CHART_COVERS.get(chart_id)
+    if cov and not _is_dummy_cover(cov):
+        return cov
     day = _today()
     tracks = load_chart_cache(chart_id, day)
-    if chart_id in _CHART_COVERS and _CHART_COVERS[chart_id]:
-        return _CHART_COVERS[chart_id]
-    # 取第一首带封面的歌曲
+    cov = _CHART_COVERS.get(chart_id)
+    if cov and not _is_dummy_cover(cov):
+        return cov
+    # 取第一首带有效封面的歌曲
     if tracks:
         for t in tracks:
             url = str(t.get("cover_url") or "")
-            if url and "artistpicserver.kuwo.cn" not in url:
+            if url and "artistpicserver.kuwo.cn" not in url and not _is_dummy_cover(url):
                 _CHART_COVERS[chart_id] = url
                 return url
     meta = chart_meta(chart_id) or {}
-    return str(meta.get("cover") or "")
+    static_cov = str(meta.get("cover") or "")
+    if static_cov and not _is_dummy_cover(static_cov):
+        return static_cov
+    return ""
 
 
 async def fetch_kg_chart(client: httpx.AsyncClient, rankid: int, limit: int = 100) -> tuple[list[dict], str]:

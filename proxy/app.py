@@ -767,9 +767,24 @@ def source_from_online_guid(guid: str) -> str:
     return parts[1] if len(parts) >= 3 else ""
 
 
+_ONLINE_TRACK_CACHE: dict[str, dict] = {}
+_MAX_ONLINE_TRACK_CACHE = 10000
+
+
+def _cache_online_track(guid: str, track: dict) -> None:
+    """全局内存在线曲目缓存（覆盖排行榜、推荐与搜索曲目），供封面与详情 0ms 命中"""
+    if not guid or not isinstance(track, dict):
+        return
+    if len(_ONLINE_TRACK_CACHE) > _MAX_ONLINE_TRACK_CACHE:
+        for k in list(_ONLINE_TRACK_CACHE.keys())[:2000]:
+            _ONLINE_TRACK_CACHE.pop(k, None)
+    _ONLINE_TRACK_CACHE[guid] = track
+
+
 def build_online_track(item: dict) -> dict:
     """对齐飞牛前端 ZQ 解构 / _h() 期望：artists、album 对象、genres 数组、audioSpec、duration 毫秒。"""
     guid = online_guid_from_item(item)
+    _cache_online_track(guid, item)
     src = str(item.get("source") or source_from_online_guid(guid) or "")
     title = str(item.get("title") or item.get("name") or "")
     artist = str(item.get("artist") or "")
@@ -1971,7 +1986,15 @@ def ensure_registry_warm() -> None:
                 continue
             _register_fakes_from_items(data.get("items") if isinstance(data, dict) else data)
     for c in charts.KG_CHARTS + charts.WY_CHARTS:
-        fake_official_guid(charts.chart_guid(c["id"]))
+        cid = c["id"]
+        fake_official_guid(charts.chart_guid(cid))
+        day = charts._today()
+        cached = charts.load_chart_cache(cid, day)
+        if cached:
+            for t in cached:
+                g = online_guid_from_item(t)
+                fake_official_guid(g)
+                _cache_online_track(g, t)
 
 
 def resolve_real_guid(candidate: str) -> str:
@@ -2814,6 +2837,9 @@ def _retained_track(request: Request, guid: str) -> tuple[dict | None, dict | No
             for alternative in item.get("_alternatives", []):
                 if online_guid_from_item(alternative) == guid:
                     return alternative, entry
+    cached_t = _ONLINE_TRACK_CACHE.get(guid) or charts.find_track(guid)
+    if cached_t:
+        return cached_t, None
     return None, None
 
 
@@ -3197,16 +3223,21 @@ async def track_transcode(request: Request):
 
 
 async def _online_info(request: Request, guid: str) -> dict | None:
+    cached_t = _ONLINE_TRACK_CACHE.get(guid) or charts.find_track(guid)
+    if cached_t:
+        return cached_t
     retained, entry = _retained_track(request, guid)
     if not _source_enabled(guid):
         return retained
     try:
         data = await asyncio.wait_for(_fetch_online_info(request, guid), timeout=4.0)
         if data:
+            _cache_online_track(guid, data)
             return data
         if await _recover_source(request, guid, entry):
             data = await asyncio.wait_for(_fetch_online_info(request, guid), timeout=3.0)
             if data:
+                _cache_online_track(guid, data)
                 return data
     except Exception:
         pass
@@ -3608,7 +3639,7 @@ async def static_cover(request: Request, subpath: str = ""):
             if cover:
                 return RedirectResponse(cover, status_code=302)
             meta = charts.chart_meta(chart_id)
-            if meta and meta.get("cover"):
+            if meta and meta.get("cover") and not charts._is_dummy_cover(meta["cover"]):
                 return RedirectResponse(meta["cover"], status_code=302)
             return _placeholder_cover_response(guid)
         upstream_client = get_upstream_client(request.app)
@@ -3625,6 +3656,13 @@ async def static_cover(request: Request, subpath: str = ""):
         guid = picked_guid
     if not is_online_guid(guid):
         return await forward_to_upstream(request, get_upstream_client(request.app))
+
+    # ① 优先极速查榜单/内存在线曲目直链封面（0ms 响应，无需等待上游查询）
+    cached_t = _ONLINE_TRACK_CACHE.get(guid) or charts.find_track(guid)
+    if cached_t:
+        cov = str(cached_t.get("cover_url") or cached_t.get("coverUrl") or "")
+        if cov and _KW_TEXT_COVER_HOST not in cov:
+            return RedirectResponse(cov, status_code=302)
 
     data = await _online_info(request, guid)
     cover = str((data or {}).get("cover_url") or "")
@@ -4687,6 +4725,10 @@ async def playlist_track_list(request: Request):
             netease_enabled=bool(CONF.get("netease_enabled")),
             limit=int(os.environ.get("FNMUSIC_CHART_LIMIT", "100")),
         )
+        for t in raw_tracks:
+            g = online_guid_from_item(t)
+            fake_official_guid(g)
+            _cache_online_track(g, t)
         tracks = [build_online_track(t) for t in raw_tracks]
         tracks = dailyrec.stamp_playlist_tracks(tracks)
         try:
