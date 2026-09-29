@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>fnmusic-ext 管理台</title>
-  <link rel="stylesheet" href="/app/fnmusic-ext/static/style.css">
+  <link rel="stylesheet" href="/app/fnmusic-ext/static/style.css?v=2.6.1">
   <link rel="icon" type="image/png" href="/app/fnmusic-ext/static/icon.png">
 </head>
 <body>
@@ -22,7 +22,7 @@
         <button class="nav-item" data-page="source">音乐源</button>
         <button class="nav-item" data-page="charts">榜单管理</button>
         <button class="nav-item" data-page="quality">播放与推荐</button>
-        <button class="nav-item" data-page="tee">边听边存</button>
+        <button class="nav-item" data-page="tee">存储与下载</button>
         <button class="nav-item" data-page="llm">高级 · 大模型</button>
       </nav>
       <div class="sidebar-foot" id="sidebar-foot"></div>
@@ -199,34 +199,43 @@
         </div>
       </section>
 
-      <!-- 边听边存 -->
+      <!-- 存储与下载 -->
       <section class="page" id="page-tee">
-        <h2>边听边存</h2>
+        <h2>存储与下载</h2>
         <div class="card">
-          <label class="switch-row"><span>边听边存<div class="sub">完整试听在线歌后自动保存到本地曲库</div></span><input type="checkbox" id="tee-enabled"></label>
-          <label class="switch-row"><span>自动下载封面<div class="sub">自动保存到本地的歌曲会顺带把封面一起下回来，直接嵌进音频文件里；飞牛音乐认的就是内嵌封面，这样官方 App 里下载的歌就有图。歌曲保存成功后才会去下封面，不会出现只有封面没有歌的垃圾文件。默认开启。</div></span><input type="checkbox" id="auto-cover"></label>
-          <label class="switch-row"><span>自动下载歌词<div class="sub">自动保存到本地的歌曲在完整下载成功后，自动下载同名 .lrc 歌词放到歌曲同一个文件夹，官方 App 扫描入库后播放就能显示歌词。歌曲下载成功后才会去下歌词，不会出现只有歌词没有歌的垃圾文件。酷我源的歌词接口已失效，暂无歌词。默认关闭。</div></span><input type="checkbox" id="lyric-auto-dl"></label>
-          <label class="field"><span>保存路径</span>
-            <input class="input" id="tee-dir" placeholder="留空自动探测共享曲库目录">
+          <div class="card-title">❤️ 收藏与歌单自动下载入库</div>
+          <label class="switch-row"><span>收藏自动下载并绑定本地<div class="sub">在飞牛音乐端给在线歌曲点红心收藏或加入歌单时，后台自动下载到 NAS 本地曲库；下载完成后收藏列表与歌单自动绑定下载好的本地曲目。默认关闭。</div></span><input type="checkbox" id="fav-autobind"></label>
+          <label class="switch-row"><span>自动下载封面<div class="sub">保存到本地的歌曲自动将源站高清封面内嵌进音频文件（飞牛音乐只认内嵌封面，内嵌后官方 App 即有图）。默认开启。</div></span><input type="checkbox" id="auto-cover"></label>
+          <label class="switch-row"><span>自动下载歌词<div class="sub">歌曲完整落库成功后，自动下载同名 .lrc 歌词放到歌曲同目录下，官方 App 扫描入库后播放即显示歌词。默认关闭。</div></span><input type="checkbox" id="lyric-auto-dl"></label>
+          <label class="field"><span>官方绑定等待（秒） <b id="bind-timeout-label"></b></span>
+            <input class="input" id="bind-timeout" type="number" min="10" max="3600">
           </label>
+          <p class="hint">下载落库后等待官方曲库收录并完成官方写入的时间上限，超时保留本地映射、打开列表时自动重试。</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🎧 在线播放边听边存</div>
+          <label class="switch-row"><span>边听边存<div class="sub">完整试听在线歌后自动保存到本地曲库。</div></span><input type="checkbox" id="tee-enabled"></label>
+          <label class="field"><span>切歌续传并行数</span>
+            <input class="input" id="handoff-max" type="number" min="0" max="20">
+          </label>
+          <p class="hint">听歌切歌不中断下载，未下完的自动转后台断点续传（并行数 0=关闭续传）。</p>
           <label class="field"><span>关闭时滚动缓存 <b id="tee-count-label"></b></span>
             <input class="input" id="tee-max" type="number" min="1" max="100">
           </label>
           <p class="hint">缓存数仅在关闭边听边存时生效；restore 还原时会一并清理这些滚动缓存。</p>
         </div>
+
         <div class="card">
-          <label class="switch-row"><span>收藏自动绑定本地<div class="sub">收藏或加入歌单的在线歌曲先立即生效，随后在后台自动下载到本地曲库；下载完成后收藏列表或歌单自动绑定已经下载好的本地歌曲而不是绑定在线歌曲。默认关闭。</div></span><input type="checkbox" id="fav-autobind"></label>
-          <label class="field"><span>官方绑定等待（秒） <b id="bind-timeout-label"></b></span>
-            <input class="input" id="bind-timeout" type="number" min="10" max="3600">
+          <div class="card-title">📁 存储目录与曲库联动</div>
+          <label class="field"><span>保存路径</span>
+            <input class="input" id="tee-dir" placeholder="留空自动探测共享曲库目录">
           </label>
-          <p class="hint">下载落库后等待官方曲库收录并完成官方写入的时间上限，超时保留本地映射、打开列表时自动重试。</p>
-          <label class="field"><span>切歌续传并行数</span>
-            <input class="input" id="handoff-max" type="number" min="0" max="20">
-          </label>
+          <p class="hint">留空时自动读取飞牛共享曲库目录；也可填入指定 NAS 绝对路径（如 /vol1/1000/Music）。</p>
           <label class="field"><span>曲库重扫接口（选填）</span>
             <input class="input" id="scan-path" placeholder="留空=官方自动扫描入库">
           </label>
-          <p class="hint">听歌切歌不中断下载，未下完的自动转后台断点续传（并行数 0=关闭续传）。重扫接口无公开文档，可从 FNMUSIC_TRACE_FORWARD=detail 取证日志捕获后填入以加速官方入库。</p>
+          <p class="hint">重扫接口无公开文档，可从 FNMUSIC_TRACE_FORWARD=detail 取证日志捕获后填入以加速官方入库。</p>
         </div>
       </section>
 
@@ -248,7 +257,7 @@
     <button class="nav-item active" data-page="overview">概览</button>
     <button class="nav-item" data-page="source">音源</button>
     <button class="nav-item" data-page="quality">播放</button>
-    <button class="nav-item" data-page="tee">缓存</button>
+    <button class="nav-item" data-page="tee">下载</button>
     <button class="nav-item" data-page="llm">高级</button>
   </nav>
 
@@ -260,6 +269,6 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="/app/fnmusic-ext/static/app.js"></script>
+  <script src="/app/fnmusic-ext/static/app.js?v=2.6.1"></script>
 </body>
 </html>
