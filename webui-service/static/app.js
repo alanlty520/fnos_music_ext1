@@ -2,7 +2,7 @@
 "use strict";
 
 // 飞牛桌面用 HTTPS 打开管理窗，页面必须挂在同源路径 /app/fnmusic-ext 下。
-// WebUI 自己也会剥掉这个前缀，所以直连 :8774 同样可用。
+// WebUI 自己也会剥掉这个前缀。管理接口只认飞牛网关注入的管理员头。
 const APP_BASE = "/app/fnmusic-ext";
 
 const $ = (sel) => document.querySelector(sel);
@@ -116,13 +116,21 @@ function applyConfigToForm() {
   $("#recommend-hot").checked = v.FNMUSIC_RECOMMEND_HOT === "true";
   $("#recommend-daily").checked = v.FNMUSIC_RECOMMEND_DAILY === "true";
   $("#tee-enabled").checked = v.FNMUSIC_TEE_SAVE_ENABLED === "true";
+  $("#auto-cover").checked = v.FNMUSIC_AUTO_COVER !== "false";
+  $("#lyric-auto-dl").checked = v.FNMUSIC_LYRIC_AUTO_DL === "true";
+  $("#fav-autobind").checked = v.FNMUSIC_FAV_AUTO_BIND === "true";
   $("#tee-dir").value = v.FNMUSIC_TEE_SAVE_DIR || "";
   $("#tee-max").value = v.FNMUSIC_TEE_CACHE_MAX || "2";
+  $("#bind-timeout").value = v.FNMUSIC_OFFICIAL_BIND_TIMEOUT_S || "120";
+  $("#handoff-max").value = v.FNMUSIC_TEE_HANDOFF_MAX != null ? v.FNMUSIC_TEE_HANDOFF_MAX : "3";
+  $("#scan-path").value = v.FNMUSIC_LIBRARY_SCAN_PATH || "";
   updateTeeCountLabel();
+  updateBindTimeoutLabel();
   $("#llm-base").value = v.FNMUSIC_LLM_BASE_URL || "";
   $("#llm-key").value = v.FNMUSIC_LLM_API_KEY || "";
   $("#llm-model").value = v.FNMUSIC_LLM_MODEL || "";
   $("#search-timeout").value = v.FNMUSIC_SEARCH_TIMEOUT || "15";
+  $("#netease-my-playlists").checked = v.FNMUSIC_NETEASE_MY_PLAYLISTS === "true";
   $("#lx-url").value = v.LX_SOURCE_URL || "";
   lxVerifiedUrl = v.LX_SOURCE_URL || null;
   renderPlatformChips();
@@ -138,12 +146,19 @@ function collectConfig() {
     FNMUSIC_RECOMMEND_HOT: $("#recommend-hot").checked,
     FNMUSIC_RECOMMEND_DAILY: $("#recommend-daily").checked,
     FNMUSIC_TEE_SAVE_ENABLED: $("#tee-enabled").checked,
+    FNMUSIC_AUTO_COVER: $("#auto-cover").checked,
+    FNMUSIC_LYRIC_AUTO_DL: $("#lyric-auto-dl").checked,
+    FNMUSIC_FAV_AUTO_BIND: $("#fav-autobind").checked,
     FNMUSIC_TEE_SAVE_DIR: $("#tee-dir").value.trim(),
     FNMUSIC_TEE_CACHE_MAX: parseInt($("#tee-max").value || "2", 10),
+    FNMUSIC_OFFICIAL_BIND_TIMEOUT_S: parseInt($("#bind-timeout").value || "120", 10) || 120,
+    FNMUSIC_TEE_HANDOFF_MAX: parseInt($("#handoff-max").value || "3", 10) || 0,
+    FNMUSIC_LIBRARY_SCAN_PATH: $("#scan-path").value.trim(),
     FNMUSIC_LLM_BASE_URL: $("#llm-base").value.trim(),
     FNMUSIC_LLM_API_KEY: $("#llm-key").value.trim(),
     FNMUSIC_LLM_MODEL: $("#llm-model").value.trim(),
     FNMUSIC_SEARCH_TIMEOUT: parseInt($("#search-timeout").value || "15", 10) || 15,
+    FNMUSIC_NETEASE_MY_PLAYLISTS: $("#netease-my-playlists").checked,
   };
   if ($("#charts-master-switch")) {
     values.FNMUSIC_RECOMMEND_CHARTS = $("#charts-master-switch").checked;
@@ -512,10 +527,10 @@ $("#lx-pick").addEventListener("click", lxPickFromNas);
 })();
 
 /* -------------------------------------------------------------- 表单脏标记 */
-["#tee-dir", "#tee-max", "#llm-base", "#llm-key", "#llm-model", "#lx-url", "#search-timeout"].forEach((sel) =>
+["#tee-dir", "#tee-max", "#llm-base", "#llm-key", "#llm-model", "#lx-url", "#search-timeout", "#bind-timeout", "#handoff-max", "#scan-path"].forEach((sel) =>
   $(sel).addEventListener("input", () => markDirty()));
 $$("input[name=quality]").forEach((el) => el.addEventListener("change", () => markDirty("音质偏好需保存后生效")));
-["#recommend-hot", "#recommend-daily", "#tee-enabled"].forEach((sel) =>
+["#recommend-hot", "#recommend-daily", "#tee-enabled", "#fav-autobind", "#auto-cover", "#lyric-auto-dl", "#netease-my-playlists"].forEach((sel) =>
   $(sel).addEventListener("change", () => markDirty()));
 
 function updateTeeCountLabel() {
@@ -523,6 +538,12 @@ function updateTeeCountLabel() {
   $("#tee-count-label").textContent = `（缓存数 ${n} 首）`;
 }
 $("#tee-max").addEventListener("input", updateTeeCountLabel);
+
+function updateBindTimeoutLabel() {
+  const n = $("#bind-timeout").value || configValues.FNMUSIC_OFFICIAL_BIND_TIMEOUT_S || "120";
+  $("#bind-timeout-label").textContent = `（${n} 秒）`;
+}
+$("#bind-timeout").addEventListener("input", updateBindTimeoutLabel);
 
 window.addEventListener("beforeunload", (ev) => {
   if (dirty) ev.preventDefault();
